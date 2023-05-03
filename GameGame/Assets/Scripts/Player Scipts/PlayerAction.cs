@@ -5,15 +5,17 @@ using UnityEngine.UI;
 
 public class PlayerAction : MonoBehaviour
 {
+    //[SerializeField] This shows Private Variables for testing
     private float p_move_speed;
+    private float p_run_speed;
     private float p_boosted_speed;
-    private float p_rotate_speed;
     private float p_jump_speed;
     public bool p_grounded;
     private bool p_jump_input_check;
     public bool p_extra_jump;
-    [SerializeField] private int p_coins;
+    private int p_coins;
 
+    private bool p_is_Running;
     private bool p_collected_Speed;
     public bool p_collected_Jump;
 
@@ -24,14 +26,15 @@ public class PlayerAction : MonoBehaviour
     void Start()
     {
         p_move_speed = 2000;
-        p_boosted_speed = 3000;
-        p_rotate_speed = 150;
+        p_run_speed = 0;
+        p_boosted_speed = 0;
         p_jump_speed = 2000;
         p_grounded = false;
         p_jump_input_check = false;
         p_extra_jump = false;
         p_coins = 0;
 
+        p_is_Running = false;
         p_collected_Speed = false;
         p_collected_Jump = false;
 
@@ -40,49 +43,110 @@ public class PlayerAction : MonoBehaviour
         p_jump_effect = GameObject.Find("Jump Effect");
         p_jump_effect.SetActive(false);
         p_rb = GetComponent<Rigidbody>();
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
 
     void Update()
     {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Cursor.lockState = CursorLockMode.None;
+        }
+
+        if (Input.GetKey(KeyCode.X))
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        transform.Rotate(0, Input.GetAxisRaw("Mouse X") * 1000 * Time.deltaTime, 0);
+
+        if (p_is_Running)
+        {
+            p_run_speed = 1000;
+        }
+        else if (!p_is_Running)
+        {
+            p_run_speed = 0;
+        }
+
         if (p_collected_Speed)
         {
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+            p_boosted_speed = 1000;
+        }
+        else if (!p_collected_Speed)
+        {
+            p_boosted_speed = 0;
+        }
+
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        {
+            //p_rb.velocity = transform.forward * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime;
+        }
+
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+        {
+            if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
             {
-                p_rb.velocity = new Vector3(transform.forward.x * p_boosted_speed * Time.deltaTime, p_rb.velocity.y, transform.forward.z * p_boosted_speed * Time.deltaTime);
+                p_rb.velocity = transform.forward * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime;
             }
 
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             {
-                p_rb.velocity = new Vector3(-transform.forward.x * p_boosted_speed * Time.deltaTime, p_rb.velocity.y, -transform.forward.z * p_boosted_speed * Time.deltaTime);
+                p_rb.velocity = transform.forward * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime + -transform.right * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime;
+            }
+
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+            {
+                p_rb.velocity = transform.forward * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime + transform.right * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime;
             }
         }
-        else
+        /*
+        if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
         {
-            if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow))
+            if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
             {
-                p_rb.velocity = new Vector3(transform.forward.x * p_move_speed * Time.deltaTime, p_rb.velocity.y, transform.forward.z * p_move_speed * Time.deltaTime);
+                p_rb.velocity = new Vector3(0, p_rb.velocity.y, -1 * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime);
             }
 
-            if (Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.DownArrow))
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
             {
-                p_rb.velocity = new Vector3(-transform.forward.x * p_move_speed * Time.deltaTime, p_rb.velocity.y, -transform.forward.z * p_move_speed * Time.deltaTime);
+                p_rb.velocity = new Vector3(-1 * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime, p_rb.velocity.y, -1 * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime);
+            }
+
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+            {
+                p_rb.velocity = new Vector3(1 * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime, p_rb.velocity.y, -1 * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime);
             }
         }
 
         if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow))
         {
+            if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+            {
+                p_rb.velocity = new Vector3(-1 * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime, p_rb.velocity.y, 0);
+            }
+
+            if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+            {
+                p_rb.velocity = new Vector3(1 * (p_move_speed + p_run_speed + p_boosted_speed) * Time.deltaTime, p_rb.velocity.y, 0);
+            }
+        }
+        */
+
+        if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.LeftArrow) && !Input.GetKey(KeyCode.RightArrow))
+        {
             p_rb.velocity = new Vector3(0, p_rb.velocity.y, 0);
         }
 
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
         {
-            transform.Rotate(0, -p_rotate_speed * Time.deltaTime, 0);
+            p_is_Running = true;
         }
-
-        if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow))
+        else
         {
-            transform.Rotate(0, p_rotate_speed * Time.deltaTime, 0);
+            p_is_Running = false;
         }
 
         if (Input.GetKey(KeyCode.Space) && !p_jump_input_check)
