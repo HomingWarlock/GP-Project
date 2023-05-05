@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class GroundCheck : MonoBehaviour
 {
-    public PlayerAction p_script;
+    public PlayerControl p_script;
 
     void Start()
     {
-        p_script = GetComponentInParent<PlayerAction>();
+        p_script = GetComponentInParent<PlayerControl>();
     }
 
     void OnTriggerStay(Collider other)
