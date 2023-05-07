@@ -13,7 +13,7 @@ public class GroundCheck : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if (other.gameObject.name == "Ground")
+        if (other.gameObject.name == "Ground" || other.gameObject.name == "SandPlatform")
         {
             p_script.p_grounded = true;
 
@@ -26,7 +26,7 @@ public class GroundCheck : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.name == "Ground")
+        if (other.gameObject.name == "Ground" || other.gameObject.name == "SandPlatform")
         {
             p_script.p_grounded = false;
         }

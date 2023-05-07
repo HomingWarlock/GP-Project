@@ -1,31 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class CamAction : MonoBehaviour
 {
-    private GameObject p_object;
-    private float m_movementX;
-    private float m_movementZ;
+    private GameObject c_cam_point;
+    private float c_pos_lerp;
+    private float c_rot_lerp;
 
-    void Start()
+    private void Start()
     {
-        p_object = GameObject.Find("Player");
+        c_cam_point = GameObject.Find("CamPoint");
+        c_pos_lerp = 1;
+        c_rot_lerp = 1;
     }
 
-    private void OnLook(Vector2 CameraRotation)
+    private void Update()
     {
-        Debug.Log(CameraRotation);
-        //Vector2 mouseVector = mouseValue.Get<Vector2>();
-
-        //m_movementX = mouseVector.x;
-        //m_movementZ = mouseVector.y;
-    }
-
-    void FixedUpdate()
-    {
-        //Vector3 mousemovement = new Vector3(m_movementX, 0.0f, m_movementZ);
-        //transform.RotateAround(p_object.transform.position, Vector3.up, mousemovement.x * 1000 * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, c_cam_point.transform.position, c_pos_lerp);
+        transform.rotation = Quaternion.Lerp(transform.rotation, c_cam_point.transform.rotation, c_rot_lerp);
     }
 }
